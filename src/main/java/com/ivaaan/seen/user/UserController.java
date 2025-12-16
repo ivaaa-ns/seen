@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ivaaan.seen.user.dto.UserMeDto;
 import com.ivaaan.seen.user.dto.UserNewDto;
@@ -31,6 +32,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    // TODO Take the id with the token JWT
     @GetMapping("/me")
     public UserMeDto getMe() {
         log.info("GET /users/me");
@@ -55,9 +57,19 @@ public class UserController {
         return userService.newMe(dto);
     }
 
+    // TODO Take the id with the token JWT
+    @PostMapping("/users/{id}/photo")
+    public UserMeDto uploadPhoto(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        log.info("POST /users/me/photo");
+        return userService.uploadPhoto(id, file);
+    }
+
     @PatchMapping("/me")
     public UserMeDto patchMe(@RequestBody UserPatchDto dto) {
         log.info("PATCH /users/me");
         return userService.patchMe(dto);
     }
+
 }
