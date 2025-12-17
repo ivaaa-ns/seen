@@ -63,6 +63,7 @@ public class UserService {
                                 .toList();
         }
 
+        // TODO We need to upload the photo too
         public UserMeDto newMe(UserNewDto dto) {
 
                 User user = new User(
@@ -87,10 +88,6 @@ public class UserService {
 
                 if (dto.getName() != null) {
                         user.setName(dto.getName());
-                }
-
-                if (dto.getPhoto() != null) {
-                        user.setPhoto(dto.getPhoto());
                 }
 
                 User saved = userRepository.save(user);

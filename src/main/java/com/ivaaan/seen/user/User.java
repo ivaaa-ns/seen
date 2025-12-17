@@ -23,26 +23,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
     @Column(nullable = false)
     private String password;
 
@@ -77,5 +57,25 @@ public class User {
 
     public String getPhoto() {
         return photo;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }

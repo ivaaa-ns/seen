@@ -51,6 +51,8 @@ public class UserController {
         return userService.getOtherUserByName(name);
     }
 
+
+    // TODO Dont send photo in dto
     @PostMapping
     public UserMeDto newUser(@RequestBody UserNewDto dto) {
         log.info("POST /users");
