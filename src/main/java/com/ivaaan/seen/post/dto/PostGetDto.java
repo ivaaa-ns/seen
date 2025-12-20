@@ -11,6 +11,18 @@ public class PostGetDto {
 
     }
 
+    
+
+    public PostGetDto(Long id, Long userId, String photo, String description, Boolean hidden) {
+        this.id = id;
+        this.userId = userId;
+        this.photo = photo;
+        this.description = description;
+        this.hidden = hidden;
+    }
+
+
+
     public Long getId() {
         return id;
     }

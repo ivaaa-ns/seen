@@ -2,6 +2,7 @@ package com.ivaaan.seen.post;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -10,12 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ivaaan.seen.post.dto.PostGetDto;
 import com.ivaaan.seen.post.dto.PostNewDto;
 import com.ivaaan.seen.post.dto.PostUpdateDto;
+import com.ivaaan.seen.uploads.FileStorageService;
 
 @RestController
 @RequestMapping("/post")
@@ -32,14 +35,17 @@ public class PostController {
     @GetMapping("{id}")
     private PostGetDto getPostById(@PathVariable String id) {
         log.info("GET /post/{}", id);
-        return this.postService.getPostById(id);
+        return this.postService.getPostById(Long.parseLong(id));
     }
 
     // TODO We need the user ID from the JWT
-    @PostMapping()
-    private PostGetDto uploadNewPost(@RequestBody PostNewDto PostNewDto, @RequestParam("file") MultipartFile file) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public PostGetDto uploadNewPost(
+            @RequestPart("data") PostNewDto postNewDto,
+            @RequestPart("file") MultipartFile file) {
         log.info("POST /post/");
-        return this.postService.uploadNewPost(PostNewDto, file);
+        FileStorageService.validatePost(file);
+        return postService.uploadNewPost(postNewDto, file);
     }
 
     // TODO We need the user ID from the JWT

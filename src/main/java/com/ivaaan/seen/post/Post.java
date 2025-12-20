@@ -27,8 +27,8 @@ public class Post {
     public Post() {
     }
 
-    public Post(Long id, User userOwner, String photo, String description, Boolean hidden) {
-        this.id = id;
+    public Post(User userOwner, String photo, String description, Boolean hidden) {
+
         this.userOwner = userOwner;
         this.photo = photo;
         this.description = description;
