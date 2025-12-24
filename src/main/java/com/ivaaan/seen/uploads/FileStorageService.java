@@ -12,8 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileStorageService {
 
-   
-
     public static void validatePost(MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
@@ -31,7 +29,24 @@ public class FileStorageService {
         }
     }
 
-     // TODO Compress files
+    public static void validatePhotoProfile(MultipartFile file) {
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Photo profile image is required");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Invalid photo profile image format");
+        }
+
+        long maxSize = 5 * 1024 * 1024; // 5 MB
+        if (file.getSize() > maxSize) {
+            throw new IllegalArgumentException("Photo profile is too large (max 5MB)");
+        }
+    }
+
+    // TODO Compress files
     public static String uploadUserPost(MultipartFile newUserPost, Long idUser, Long idPost) {
         try {
             Path uploadDir = Paths.get("uploads/users/" + idUser + "/posts/");

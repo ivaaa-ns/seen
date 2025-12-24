@@ -5,7 +5,7 @@ public class UserNewDto {
     private String name;
     private String email;
     private String password;
-    private String photo;
+
 
     public UserNewDto() {}
 
@@ -21,9 +21,6 @@ public class UserNewDto {
         return password;
     }
 
-    public String getPhoto() {
-        return photo;
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -37,7 +34,4 @@ public class UserNewDto {
         this.password = password;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
 }

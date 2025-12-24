@@ -1,5 +1,6 @@
 package com.ivaaan.seen.user;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,9 +8,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ivaaan.seen.uploads.FileStorageService;
 import com.ivaaan.seen.user.dto.UserMeDto;
 import com.ivaaan.seen.user.dto.UserNewDto;
 import com.ivaaan.seen.user.dto.UserOtherDto;
@@ -51,8 +54,7 @@ public class UserController {
         return userService.getOtherUserByName(name);
     }
 
-
-    // TODO Dont send photo in dto
+   
     @PostMapping
     public UserMeDto newUser(@RequestBody UserNewDto dto) {
         log.info("POST /users");
@@ -60,11 +62,13 @@ public class UserController {
     }
 
     // TODO Take the id with the token JWT
-    @PostMapping("/users/{id}/photo")
+    @PostMapping(value = "/{id}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserMeDto uploadPhoto(
             @PathVariable Long id,
-            @RequestParam("file") MultipartFile file) {
-        log.info("POST /users/me/photo");
+            @RequestPart("file") MultipartFile file) {
+
+        log.info("POST /users/{}/photo", id);
+        FileStorageService.validatePhotoProfile(file);
         return userService.uploadPhoto(id, file);
     }
 
@@ -73,5 +77,7 @@ public class UserController {
         log.info("PATCH /users/me");
         return userService.patchMe(dto);
     }
+
+    // TODO Delete user
 
 }

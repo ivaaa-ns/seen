@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ivaaan.seen.uploads.FileStorageService;
 import com.ivaaan.seen.user.dto.UserMeDto;
 import com.ivaaan.seen.user.dto.UserNewDto;
 import com.ivaaan.seen.user.dto.UserOtherDto;
@@ -63,14 +64,13 @@ public class UserService {
                                 .toList();
         }
 
-        // TODO We need to upload the photo too
         public UserMeDto newMe(UserNewDto dto) {
 
                 User user = new User(
                                 dto.getName(),
                                 dto.getEmail(),
                                 passwordEncoder.encode(dto.getPassword()),
-                                dto.getPhoto());
+                                null);
 
                 User saved = userRepository.save(user);
 
@@ -99,43 +99,22 @@ public class UserService {
                                 saved.getPhoto());
         }
 
-        // TODO This creates multiple files per user; only one active file should exist
-
         public UserMeDto uploadPhoto(Long id, MultipartFile file) {
-
-                if (file.isEmpty()) {
-                        throw new IllegalArgumentException("File is empty");
-                }
-
-                String contentType = file.getContentType();
-                if (contentType == null || !contentType.startsWith("image/")) {
-                        throw new IllegalArgumentException("Invalid file type");
-                }
 
                 User user = userRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-                try {
-                        Path uploadDir = Paths.get("uploads/users");
-                        Files.createDirectories(uploadDir);
+                String urlPhoto = FileStorageService.uploadUserPhotoProfile(file, id);
 
-                        String filename = UUID.randomUUID() + "-" + file.getOriginalFilename();
-                        Path path = uploadDir.resolve(filename);
+                user.setPhoto(urlPhoto);
+                User saved = userRepository.save(user);
 
-                        Files.copy(file.getInputStream(), path);
+                return new UserMeDto(
+                                saved.getId(),
+                                saved.getName(),
+                                saved.getEmail(),
+                                saved.getPhoto());
 
-                        user.setPhoto(path.toString());
-                        User saved = userRepository.save(user);
-
-                        return new UserMeDto(
-                                        saved.getId(),
-                                        saved.getName(),
-                                        saved.getEmail(),
-                                        saved.getPhoto());
-
-                } catch (IOException e) {
-                        throw new RuntimeException("Error saving file", e);
-                }
         }
 
 }

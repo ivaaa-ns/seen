@@ -2,6 +2,7 @@ package com.ivaaan.seen.post;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    // TODO We need the user ID from the JWT
     @GetMapping("{id}")
     private PostGetDto getPostById(@PathVariable String id) {
         log.info("GET /post/{}", id);
@@ -49,17 +52,17 @@ public class PostController {
     }
 
     // TODO We need the user ID from the JWT
-    // TODO We need to return status good
     @DeleteMapping("{id}")
-    private PostGetDto deletePostById(@PathVariable String id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    private void deletePostById(@PathVariable String id) {
         log.info("DELETE /post/{}", id);
-        return this.postService.deletePostById(id);
+        this.postService.deletePostById(Long.parseLong(id));
     }
 
     @PatchMapping("{id}")
     private PostGetDto patchPostById(@RequestBody PostUpdateDto postUpdateDto, @PathVariable String id) {
         log.info("PATCH /post/{}", id);
-        return this.postService.patchPostById(postUpdateDto, id);
+        return this.postService.patchPostById(postUpdateDto, Long.parseLong(id));
     }
 
 }
