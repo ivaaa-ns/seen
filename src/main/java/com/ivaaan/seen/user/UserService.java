@@ -81,9 +81,9 @@ public class UserService {
                                 saved.getPhoto());
         }
 
-        public UserMeDto patchMe(UserPatchDto dto) {
+        public UserMeDto patchMe(Long id, UserPatchDto dto) {
 
-                User user = userRepository.findById(dto.getId())
+                User user = userRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 if (dto.getName() != null) {

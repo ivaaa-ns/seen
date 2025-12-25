@@ -1,5 +1,6 @@
 package com.ivaaan.seen.post;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ivaaan.seen.post.dto.PostGetDto;
@@ -19,18 +20,21 @@ public class PostService {
                 this.userRepository = userRepository;
         }
 
-        // TODO Validate owner if hidden
-        public PostGetDto getPostById(Long id) {
+        public PostGetDto getPostById(Long id, Long userId) {
                 Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+
+                if (post.getHidden() && !post.getUserOwner().getId().equals(userId)) {
+                        throw new AccessDeniedException("Post is hidden");
+                }
 
                 return new PostGetDto(post.getId(), post.getUserOwner().getId(), post.getPhoto(), post.getDescription(),
                                 post.getHidden());
 
         }
 
-        public PostGetDto uploadNewPost(PostNewDto postNewDto, MultipartFile photo) {
+        public PostGetDto uploadNewPost(PostNewDto postNewDto, MultipartFile photo, Long userId) {
 
-                User userOwner = userRepository.findById(postNewDto.getUserId())
+                User userOwner = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Post savedPost = postRepository.save(new Post(
@@ -54,11 +58,14 @@ public class PostService {
                                 finalPost.getHidden());
         }
 
-        // TODO Validate owner
-        public PostGetDto patchPostById(PostUpdateDto postUpdateDto, Long id) {
+        public PostGetDto patchPostById(PostUpdateDto postUpdateDto, Long id, Long userId) {
 
                 Post post = postRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Post not found"));
+
+                if (!post.getUserOwner().getId().equals(userId)) {
+                        throw new AccessDeniedException("You are not the owner of this post");
+                }
 
                 if (postUpdateDto.getDescription() != null) {
                         post.setDescription((postUpdateDto.getDescription()));
@@ -79,10 +86,13 @@ public class PostService {
 
         }
 
-        // TODO Validate owner
-        public void deletePostById(Long id) {
+        public void deletePostById(Long id, Long userId) {
                 Post post = postRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Post not found"));
+
+                if (!post.getUserOwner().getId().equals(userId)) {
+                        throw new AccessDeniedException("You are not the owner of this post");
+                }
 
                 postRepository.delete(post);
         }

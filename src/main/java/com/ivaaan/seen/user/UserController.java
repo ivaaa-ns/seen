@@ -1,6 +1,7 @@
 package com.ivaaan.seen.user;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,47 +36,53 @@ public class UserController {
         this.userService = userService;
     }
 
-    // TODO Take the id with the token JWT
     @GetMapping("/me")
-    public UserMeDto getMe() {
+    public UserMeDto getMe(Authentication authentication) {
         log.info("GET /users/me");
-        return userService.getMe(Long.parseLong("2"));
+        Long userId = (Long) authentication.getPrincipal();
+        return userService.getMe(userId);
     }
 
+    // TODO Care with my own profile
     @GetMapping("/id/{id}")
     public UserOtherDto getOtherUserById(@PathVariable String id) {
         log.info("GET /users/id/{}", id);
         return userService.getOtherUserById(Long.parseLong(id));
     }
 
+    // TODO Care with my own profile
     @GetMapping("/name/{name}")
     public List<UserOtherDto> getOtherUserByName(@PathVariable String name) {
         log.info("GET /users/name/{}", name);
         return userService.getOtherUserByName(name);
     }
 
-   
+    // TODO Care with /auth
     @PostMapping
     public UserMeDto newUser(@RequestBody UserNewDto dto) {
         log.info("POST /users");
         return userService.newMe(dto);
     }
 
-    // TODO Take the id with the token JWT
-    @PostMapping(value = "/{id}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/me/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserMeDto uploadPhoto(
-            @PathVariable Long id,
+            Authentication authentication,
             @RequestPart("file") MultipartFile file) {
 
-        log.info("POST /users/{}/photo", id);
+        log.info("POST /users/me/photo");
+
+        Long userId = (Long) authentication.getPrincipal();
+
         FileStorageService.validatePhotoProfile(file);
-        return userService.uploadPhoto(id, file);
+
+        return userService.uploadPhoto(userId, file);
     }
 
     @PatchMapping("/me")
-    public UserMeDto patchMe(@RequestBody UserPatchDto dto) {
+    public UserMeDto patchMe(Authentication authentication, @RequestBody UserPatchDto dto) {
         log.info("PATCH /users/me");
-        return userService.patchMe(dto);
+        Long userId = (Long) authentication.getPrincipal();
+        return userService.patchMe(userId, dto);
     }
 
     // TODO Delete user
