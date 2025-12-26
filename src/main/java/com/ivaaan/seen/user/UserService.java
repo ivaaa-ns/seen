@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ivaaan.seen.uploads.FileStorageService;
@@ -64,23 +65,9 @@ public class UserService {
                                 .toList();
         }
 
-        public UserMeDto newMe(UserNewDto dto) {
+    
 
-                User user = new User(
-                                dto.getName(),
-                                dto.getEmail(),
-                                passwordEncoder.encode(dto.getPassword()),
-                                null);
-
-                User saved = userRepository.save(user);
-
-                return new UserMeDto(
-                                saved.getId(),
-                                saved.getName(),
-                                saved.getEmail(),
-                                saved.getPhoto());
-        }
-
+        // ! CARE WITH STRINGS LIKE " "
         public UserMeDto patchMe(Long id, UserPatchDto dto) {
 
                 User user = userRepository.findById(id)
@@ -114,6 +101,17 @@ public class UserService {
                                 saved.getName(),
                                 saved.getEmail(),
                                 saved.getPhoto());
+
+        }
+
+        // ! NEW ENTITY -> UPDATE USER.JAVA TO DELETE IN CASCADE
+        @Transactional
+        public void deleteMe(Long userId) {
+
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                userRepository.delete(user);
 
         }
 

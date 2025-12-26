@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ivaaan.seen.auth.dto.LoginDto;
+import com.ivaaan.seen.auth.dto.RegisterDto;
 import com.ivaaan.seen.auth.dto.TokenResponseDto;
 import com.ivaaan.seen.user.User;
 import com.ivaaan.seen.user.UserRepository;
@@ -38,4 +39,27 @@ public class AuthService {
 
         return new TokenResponseDto(token);
     }
+
+    public TokenResponseDto register(RegisterDto dto) {
+
+        String email = dto.getEmail().toLowerCase().trim();
+
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("That email is already used");
+        }
+
+        User user = new User(
+                null,
+                email,
+                passwordEncoder.encode(dto.getPassword()),
+                null 
+        );
+
+        User saved = userRepository.save(user);
+
+        String token = jwtService.generateToken(saved.getId());
+
+        return new TokenResponseDto(token);
+    }
+
 }

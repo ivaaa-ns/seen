@@ -4,17 +4,18 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class LoginDto {
+public class RegisterDto {
     // TODO Maybe in the future register and login with google
-    @Email(message = "Invalid email")
-    @NotBlank(message = "Email is required")
+
+    @Email(message = "auth.email.invalid")
+    @NotBlank(message = "auth.email.required")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @NotBlank(message = "auth.password.required")
+    @Size(min = 8, message = "auth.password.min_length")
     private String password;
 
-    public LoginDto() {
+    public RegisterDto() {
     }
 
     public String getEmail() {

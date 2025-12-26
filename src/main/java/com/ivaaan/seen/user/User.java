@@ -1,12 +1,18 @@
 package com.ivaaan.seen.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ivaaan.seen.post.Post;
 import com.ivaaan.seen.user.dto.UserMeDto;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,6 +34,9 @@ public class User {
 
     @Column
     private String photo;
+
+    @OneToMany(mappedBy = "userOwner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     protected User() {
     }

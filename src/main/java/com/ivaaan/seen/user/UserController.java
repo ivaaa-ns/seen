@@ -1,7 +1,9 @@
 package com.ivaaan.seen.user;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,30 +41,22 @@ public class UserController {
 
     @GetMapping("/me")
     public UserMeDto getMe(Authentication authentication) {
-        log.info("GET /users/me");
+
         Long userId = (Long) authentication.getPrincipal();
+        log.info("GET /users/me", userId);
         return userService.getMe(userId);
     }
 
-    // TODO Care with my own profile
     @GetMapping("/id/{id}")
     public UserOtherDto getOtherUserById(@PathVariable String id) {
         log.info("GET /users/id/{}", id);
         return userService.getOtherUserById(Long.parseLong(id));
     }
 
-    // TODO Care with my own profile
     @GetMapping("/name/{name}")
     public List<UserOtherDto> getOtherUserByName(@PathVariable String name) {
         log.info("GET /users/name/{}", name);
         return userService.getOtherUserByName(name);
-    }
-
-    // TODO Care with /auth
-    @PostMapping
-    public UserMeDto newUser(@RequestBody UserNewDto dto) {
-        log.info("POST /users");
-        return userService.newMe(dto);
     }
 
     @PostMapping(value = "/me/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -69,10 +64,8 @@ public class UserController {
             Authentication authentication,
             @RequestPart("file") MultipartFile file) {
 
-        log.info("POST /users/me/photo");
-
         Long userId = (Long) authentication.getPrincipal();
-
+        log.info("POST /users/me/photo", userId);
         FileStorageService.validatePhotoProfile(file);
 
         return userService.uploadPhoto(userId, file);
@@ -80,11 +73,18 @@ public class UserController {
 
     @PatchMapping("/me")
     public UserMeDto patchMe(Authentication authentication, @RequestBody UserPatchDto dto) {
-        log.info("PATCH /users/me");
+
         Long userId = (Long) authentication.getPrincipal();
+        log.info("PATCH /users/me", userId);
         return userService.patchMe(userId, dto);
     }
 
-    // TODO Delete user
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMe(Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+        log.info("DELETE /users/me", userId);
+        userService.deleteMe(userId);
+    }
 
 }
