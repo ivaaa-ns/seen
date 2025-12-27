@@ -19,6 +19,7 @@ public class Post {
     @Column(nullable = false)
     private String photo;
 
+    @Column(nullable = true, length = 100)
     private String description;
 
     @Column(nullable = false)

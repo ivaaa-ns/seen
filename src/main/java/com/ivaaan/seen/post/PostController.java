@@ -38,6 +38,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    // ! Only can see friends posts
     @GetMapping("/userId/{id}")
     public List<PostGetDto> getPostByUserId(Authentication authentication, @PathVariable Long id) {
         log.info("GET /post/userId/{}", id);
