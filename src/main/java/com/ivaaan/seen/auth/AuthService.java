@@ -1,6 +1,8 @@
 package com.ivaaan.seen.auth;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ivaaan.seen.auth.dto.LoginDto;
@@ -29,14 +31,19 @@ public class AuthService {
     public TokenResponseDto login(LoginDto dto) {
 
         User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "auth.invalid_credentials"
+                ));
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "auth.invalid_credentials"
+            );
         }
 
         String token = jwtService.generateToken(user.getId());
-
         return new TokenResponseDto(token);
     }
 
@@ -45,21 +52,22 @@ public class AuthService {
         String email = dto.getEmail().toLowerCase().trim();
 
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("That email is already used");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "auth.email.already_used"
+            );
         }
 
         User user = new User(
                 null,
                 email,
                 passwordEncoder.encode(dto.getPassword()),
-                null 
+                null
         );
 
         User saved = userRepository.save(user);
 
         String token = jwtService.generateToken(saved.getId());
-
         return new TokenResponseDto(token);
     }
-
 }

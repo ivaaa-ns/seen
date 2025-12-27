@@ -43,7 +43,7 @@ public class UserController {
     public UserMeDto getMe(Authentication authentication) {
 
         Long userId = (Long) authentication.getPrincipal();
-        log.info("GET /users/me", userId);
+        log.info("GET /users/me for user {}", userId);
         return userService.getMe(userId);
     }
 
@@ -65,7 +65,7 @@ public class UserController {
             @RequestPart("file") MultipartFile file) {
 
         Long userId = (Long) authentication.getPrincipal();
-        log.info("POST /users/me/photo", userId);
+        log.info("POST /users/me/photo for user {}", userId);
         FileStorageService.validatePhotoProfile(file);
 
         return userService.uploadPhoto(userId, file);
@@ -75,7 +75,7 @@ public class UserController {
     public UserMeDto patchMe(Authentication authentication, @RequestBody UserPatchDto dto) {
 
         Long userId = (Long) authentication.getPrincipal();
-        log.info("PATCH /users/me", userId);
+        log.info("PATCH /users/me for user {}", userId);
         return userService.patchMe(userId, dto);
     }
 
@@ -83,7 +83,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteMe(Authentication authentication) {
         Long userId = (Long) authentication.getPrincipal();
-        log.info("DELETE /users/me", userId);
+        log.info("DELETE /users/me for user {}", userId);
         userService.deleteMe(userId);
     }
 

@@ -69,6 +69,7 @@ public class FileStorageService {
     }
 
     // TODO Compress files
+    // TODO Care prod url
     public static String uploadUserPhotoProfile(MultipartFile newUserPhotoProfile, Long idUser) {
         try {
             Path uploadDir = Paths.get("uploads/users/" + idUser + "/profile/");

@@ -1,7 +1,9 @@
 package com.ivaaan.seen.post;
 
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ivaaan.seen.post.dto.PostGetDto;
 import com.ivaaan.seen.post.dto.PostNewDto;
@@ -10,6 +12,11 @@ import com.ivaaan.seen.uploads.FileStorageService;
 import com.ivaaan.seen.user.User;
 import com.ivaaan.seen.user.UserRepository;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+import java.util.List;
+
+@Service
 public class PostService {
         private PostRepository postRepository;
         private UserRepository userRepository;
@@ -21,10 +28,11 @@ public class PostService {
         }
 
         public PostGetDto getPostById(Long id, Long userId) {
-                Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+                Post post = postRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "post.not_found"));
 
                 if (post.getHidden() && !post.getUserOwner().getId().equals(userId)) {
-                        throw new AccessDeniedException("Post is hidden");
+                        throw new AccessDeniedException("post.hidden");
                 }
 
                 return new PostGetDto(post.getId(), post.getUserOwner().getId(), post.getPhoto(), post.getDescription(),
@@ -35,7 +43,7 @@ public class PostService {
         public PostGetDto uploadNewPost(PostNewDto postNewDto, MultipartFile photo, Long userId) {
 
                 User userOwner = userRepository.findById(userId)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "user.not_found"));
 
                 Post savedPost = postRepository.save(new Post(
                                 userOwner,
@@ -61,10 +69,11 @@ public class PostService {
         public PostGetDto patchPostById(PostUpdateDto postUpdateDto, Long id, Long userId) {
 
                 Post post = postRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Post not found"));
+                                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "post.not_found"));
 
                 if (!post.getUserOwner().getId().equals(userId)) {
-                        throw new AccessDeniedException("You are not the owner of this post");
+                        throw new AccessDeniedException("post.not_owner");
+
                 }
 
                 if (postUpdateDto.getDescription() != null) {
@@ -87,14 +96,28 @@ public class PostService {
         }
 
         public void deletePostById(Long id, Long userId) {
+
                 Post post = postRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Post not found"));
+                                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "post.not_found"));
 
                 if (!post.getUserOwner().getId().equals(userId)) {
-                        throw new AccessDeniedException("You are not the owner of this post");
+                        throw new AccessDeniedException("post.not_owner");
                 }
 
                 postRepository.delete(post);
+        }
+
+        public List<PostGetDto> getPostByUserId(Long id) {
+
+                return postRepository.findAllByUserOwnerIdAndHiddenFalse(id)
+                                .stream()
+                                .map(post -> new PostGetDto(
+                                                post.getId(),
+                                                post.getUserOwner().getId(),
+                                                post.getPhoto(),
+                                                post.getDescription(),
+                                                post.getHidden()))
+                                .toList();
         }
 
 }
